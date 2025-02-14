@@ -8,5 +8,6 @@ router.get('/', function (req, res, next) {
 });
 
 router.use('/auth', authRoutes)
+// router.use('/blogs' ,  )
 
 module.exports = router;
