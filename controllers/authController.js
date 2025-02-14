@@ -59,7 +59,9 @@ exports.signUp = async (req, res, next) => {
             password,
             userphoto: Img.path
         })
+        
         await user.save()
+        await Signup.deleteOne()
         res.status(201).json({
             message: 'User created successfully',
             user: user

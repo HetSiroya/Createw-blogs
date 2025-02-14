@@ -12,5 +12,4 @@ const registrationModel = new mongoose.Schema({
     }
 });
 
-// Check if model already exists before creating it
-module.exports = mongoose.models.Signup || mongoose.model('rigistartion', registrationModel);   
+module.exports = mongoose.model('Registration', registrationModel);
