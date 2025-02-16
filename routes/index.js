@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var authRoutes = require('./authRoutes')
+var blogs = require('./blogs')
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
@@ -8,6 +9,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.use('/auth', authRoutes)
+router.use('/blog', blogs)
 // router.use('/blogs' ,  )
 
 module.exports = router;

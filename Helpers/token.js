@@ -6,8 +6,8 @@ function generatetoken(user) {
     const playload = {
         id: user._id,
         email: user.email,
-        name: user.Name,
-        Mobilenumber: user.MobileNumber,
+        firstname: user.firstname,
+        lastname: user.lastname
         // password: user.password
     }
     let jwtScecrte = process.env.JWT_SECRET_KEY;
