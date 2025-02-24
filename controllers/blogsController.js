@@ -61,30 +61,7 @@ exports.getblogs = async (req, res) => {
         });
     }
 };
-// exports.getblogs = async (req, res) => {
-//     try {
-//         const { userid, category } = req.query
-//         if (category != undefined) {
-//             const blogs = await blogModel.find();
-//             res.status(200).json({ blogs });
-//         }
-//         else {
-//             const blogs = await blogModel.find();
-//             res.status(200).json({ blogs });
-//         }
-//         const blogs = await blogModel.find({
-//             userId: userid,
-//             category: category
-//         });
-//         res.status(200).json({ blogs });
-//     }
-//     catch (err) {
-//         res.status(500).json({
-//             message: 'Error retrieving blogs',
-//             error: err.message
-//         });
-//     }
-// }
+
 
 exports.editblog = async (req, res) => {
     try {
@@ -157,18 +134,5 @@ exports.loginuserdetail = async (req, res) => {
     }
 }
 
-// exports.allblogs = async (req, res) => {
-//     try {
-//         const blog =
-//         const blogs = await blogModel.find();
 
-//         res.status(200).json({ blogs });
-//     }
-//     catch (err) {
-//         res.status(500).json({
-//             message: 'Error retrieving blogs',
-//             error: err.message
-//         })
-//     }
-// }
 

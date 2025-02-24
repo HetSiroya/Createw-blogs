@@ -46,7 +46,7 @@ exports.signUp = async (req, res, next) => {
         }
         const Img = req.file;
         console.log("Img" + Img);
-        
+
         if (!Img) {
             return res.status(400).json({ message: 'Please upload an image' })
         }
@@ -109,4 +109,20 @@ exports.login = async (req, res) => {
     }
 }
 
-
+exports.getusers = async (req, res) => {
+    try {
+        const users = await signupModel.find({ email: { $ne: req.user.email } })
+        res.status(200).json({
+            message: 'Users fetched successfully',
+            users: users
+        })
+    }
+    catch (error) {
+        // next(error)
+        console.error(error)
+        res.status(500).json({
+            message: 'Server Error',
+            error: error.message
+        })
+    }
+}
