@@ -40,27 +40,32 @@ exports.getblogs = async (req, res) => {
         let blogs;
 
         if (!userid && !category) {
-            blogs = await blogModel.find({ userId: { $ne: currentUser } })
-                .populate('userId', 'name email profileImage');
+            blogs = await blogModel.find({ userId: { $ne: currentUser } });
         } else if (userid && !category) {
             blogs = await blogModel.find({
                 userId: userid,
                 userId: { $ne: currentUser }
-            }).populate('userId', 'name email profileImage');
+            });
         } else if (!userid && category) {
             blogs = await blogModel.find({
                 category: category,
                 userId: { $ne: currentUser }
-            }).populate('userId', 'name email profileImage');
+            });
         } else {
             blogs = await blogModel.find({
                 userId: userid,
                 category: category,
                 userId: { $ne: currentUser }
-            }).populate('userId', 'name email profileImage');
+            });
         }
 
-        res.status(200).json({ blogs });
+        // Add image path to the response
+        const blogsWithImagePath = blogs.map(blog => ({
+            ...blog.toObject(),
+            blogImagePath: `${req.protocol}://${req.get('host')}/${blog.blogImage}`
+        }));
+
+        res.status(200).json({ blogs: blogsWithImagePath });
     } catch (err) {
         res.status(500).json({
             message: 'Error retrieving blogs',
@@ -111,7 +116,15 @@ exports.getblogsuser = async (req, res) => {
         if (!blogs) {
             return res.status(404).json({ message: 'No blogs found for this user' });
         }
-        res.status(200).json({ blogs });
+
+        // Add image path to the response
+        const blogsWithImagePath = blogs.map(blog => ({
+            ...blog.toObject(),
+            blogImagePath: `${req.protocol}://${req.get('host')}/${blog.blogImage}`
+
+        }));
+
+        res.status(200).json({ blogs: blogsWithImagePath });
     }
     catch (err) {
         res.status(500).json({
@@ -130,8 +143,24 @@ exports.loginuserdetail = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
         const loginuserblog = await blogModel.find({ userId: userdetail._id });
-        res.status(200).json({ userdetail, loginuserblog });
-        // res.status(200).json({ user });
+
+        // Transform blogs to include image paths
+        const blogsWithImagePath = loginuserblog.map(blog => ({
+            ...blog.toObject(),
+            blogImagePath: `${req.protocol}://${req.get('host')}/${blog.blogImage}`
+
+        }));
+
+        // Add user image path to userdetail
+        const userWithImagePath = {
+            ...userdetail.toObject(),
+            userImagePath: `${req.protocol}://${req.get('host')}/${user.userphoto}`
+        };
+
+        res.status(200).json({
+            userdetail: userWithImagePath,
+            loginuserblog: blogsWithImagePath
+        });
     }
     catch (err) {
         res.status(500).json({
