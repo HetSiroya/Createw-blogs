@@ -58,7 +58,7 @@ exports.signUp = async (req, res, next) => {
             lastname,
             email,
             password,
-            userphoto: Img.path
+            userphoto: Img.filename
         })
         const token = generatetoken(user)
         await user.save()
@@ -112,9 +112,25 @@ exports.login = async (req, res) => {
 exports.getusers = async (req, res) => {
     try {
         const users = await signupModel.find({ email: { $ne: req.user.email } })
+        if (!users) {
+            return res.status(400).json({ msg: 'No users found' })
+        }
+        if (users.length === 0) {
+            return res.status(400).json({ msg: 'No users found' })
+        }
+
+        // Map users to include full image path
+        const usersWithImagePath = users.map(user => ({
+            _id: user._id,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            userphoto: `${req.protocol}://${req.get('host')}/${user.userphoto}`
+        }));
+
         res.status(200).json({
             message: 'Users fetched successfully',
-            users: users
+            users: usersWithImagePath
         })
     }
     catch (error) {

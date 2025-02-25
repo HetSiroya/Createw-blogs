@@ -9,7 +9,7 @@ exports.postblog = async (req, res) => {
         console.log(userId);
         const blogphto = req.file
         console.log("blogphto", blogphto);
-        
+
         const { title, content, category } = req.body;
         const blog = new blogModel({
             userId: userId,
@@ -40,26 +40,25 @@ exports.getblogs = async (req, res) => {
         let blogs;
 
         if (!userid && !category) {
-            blogs = await blogModel.find({ userId: { $ne: currentUser } });
+            blogs = await blogModel.find({ userId: { $ne: currentUser } })
+                .populate('userId', 'name email profileImage');
         } else if (userid && !category) {
             blogs = await blogModel.find({
                 userId: userid,
                 userId: { $ne: currentUser }
-            });
+            }).populate('userId', 'name email profileImage');
         } else if (!userid && category) {
             blogs = await blogModel.find({
                 category: category,
                 userId: { $ne: currentUser }
-            });
+            }).populate('userId', 'name email profileImage');
         } else {
             blogs = await blogModel.find({
                 userId: userid,
                 category: category,
                 userId: { $ne: currentUser }
-            });
+            }).populate('userId', 'name email profileImage');
         }
-
-
 
         res.status(200).json({ blogs });
     } catch (err) {
