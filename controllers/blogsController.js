@@ -8,16 +8,22 @@ exports.postblog = async (req, res) => {
         const userId = user._id
         console.log(userId);
         const blogphto = req.file
+        console.log("blogphto", blogphto);
+        
         const { title, content, category } = req.body;
         const blog = new blogModel({
             userId: userId,
-            blogImage: blogphto.path,
+            blogImage: blogphto.filename,
             title: title,
             description: content,
             category: category
         });
         await blog.save();
-        res.status(201).json({ message: 'Blog created successfully', blog });
+        res.status(201).json({
+            message: 'Blog created successfully',
+            blog,
+            blogPath: blogphto.filename
+        });
     }
     catch (err) {
         res.status(500).json({
@@ -53,6 +59,8 @@ exports.getblogs = async (req, res) => {
             });
         }
 
+
+
         res.status(200).json({ blogs });
     } catch (err) {
         res.status(500).json({
@@ -61,7 +69,7 @@ exports.getblogs = async (req, res) => {
         });
     }
 };
-    
+
 
 exports.editblog = async (req, res) => {
     try {
