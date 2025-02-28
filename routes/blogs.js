@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.post('/posts', upload.single("blog"), security, postblog)
 router.get('/get', security, getblogs);
-router.patch('/editdata', security, editblog)
+router.patch('/editdata', upload.single("blog"), security, editblog)
 router.delete('/delete', security, deleteblog)
 router.get('/getbloguser', security, getblogsuser)
 router.get('/loginuser', security, loginuserdetail)
