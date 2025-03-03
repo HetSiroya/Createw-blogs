@@ -109,6 +109,52 @@ exports.login = async (req, res) => {
     }
 }
 
+exports.updateProfile = async (req, res) => {
+    try {
+        const user = req.user
+        const { firstname, lastname } = req.body
+
+        let updateData = {
+            firstname,
+            lastname
+        }
+
+        // Only add photo to update if file was uploaded
+        if (req.file) {
+            updateData.userphoto = req.file.filename  // Changed from profilephoto to userphoto to match schema
+        }
+
+        const updatedUser = await signupModel.findByIdAndUpdate(
+            user._id,
+            updateData,
+            { new: true }
+        )
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' })
+        }
+
+        // Create response with full image path
+        const userResponse = {
+            ...updatedUser.toObject(),
+            userphoto: updatedUser.userphoto
+                ? `${req.protocol}://${req.get('host')}/${updatedUser.userphoto}`
+                : null
+        }
+
+        res.status(200).json({
+            message: 'User profile updated successfully',
+            user: userResponse
+        })
+    }
+    catch (error) {
+        console.error(error)
+        res.status(500).json({
+            message: 'Server Error',
+            error: error.message
+        })
+    }
+}
 exports.getusers = async (req, res) => {
     try {
         const users = await signupModel.find({ email: { $ne: req.user.email } })
@@ -142,3 +188,93 @@ exports.getusers = async (req, res) => {
         })
     }
 }
+
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: "Please enter email" });
+        }
+        const user = await signupModel.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        const otp = generateOTP();
+        console.log("otp", otp);
+        let existingOtp = await registrationModel.findOne({ email });
+
+        if (existingOtp) {
+            await registrationModel.updateOne({ email }, { OTP: otp });
+        } else {
+            const data = new registrationModel({
+                email: email,
+                OTP: otp
+            });
+            await data.save();
+        }
+
+        res.status(200).json({
+            status: true,
+            message: "Reset OTP sent to email",
+        });
+    } catch (error) {
+        console.error("Error forgot password:", error.message);
+        res.status(500).json({ status: false, message: "Server Error" });
+    }
+};
+
+exports.verifyResetOtp = async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: "Please enter email" });
+        }
+        if (!otp) {
+            return res.status(400).json({ message: "Please enter OTP" });
+        }
+        if (!newPassword) {
+            return res.status(400).json({ message: "Please enter newPassword" });
+        }
+
+        // First verify OTP
+        const otpExists = await registrationModel.findOne({
+            email: email,
+            OTP: otp
+        });
+
+        if (!otpExists) {
+            return res.status(400).json({ message: "Invalid OTP or email" });
+        }
+
+        // Update password in signup model
+        const updatedUser = await signupModel.findOneAndUpdate(
+            { email: email },
+            {
+                $set: {
+                    password: newPassword,
+                    verified: true
+                }
+            },
+            { new: true }
+        );
+
+        if (!updatedUser) {
+            return res.status(400).json({ message: "User not found" });
+        }
+
+        // Delete the OTP record after successful password reset
+        await registrationModel.deleteOne({ email: email });
+
+        res.status(200).json({
+            status: true,
+            message: "Password reset successfully",
+            data: {
+                email: updatedUser.email
+            }
+        });
+
+    } catch (error) {
+        console.error("Error verifying reset OTP:", error.message);
+        res.status(500).json({ status: false, message: "Server Error" });
+    }
+};
