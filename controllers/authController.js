@@ -278,3 +278,50 @@ exports.verifyResetOtp = async (req, res) => {
         res.status(500).json({ status: false, message: "Server Error" });
     }
 };
+
+exports.changePassword = async (req, res) => {
+    try {
+        const user = req.user;
+        const email = user.email;
+        const { oldPassword, newPassword } = req.body;
+        if (!oldPassword) {
+            return res.status(400).json({ message: "Please enter oldPassword" });
+        }
+        if (!newPassword) {
+            return res.status(400).json({ message: "Please enter newPassword" });
+        }
+        if (oldPassword === newPassword) {
+            return res.status(400).json({ message: "New password cannot be the same as the old password" });
+        }
+        const userdata = await signupModel.findOne({ email });
+        if (!userdata) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        if (user.password !== oldPassword) {
+            return res.status(400).json({ message: "Old password is incorrect" });
+        }
+
+        const updated = await signupModel.findOneAndUpdate(
+            { email: email },
+            {
+                $set: {
+                    password: newPassword
+                }
+            },
+            { new: true }
+        );
+
+        res.status(200).json({
+            status: true,
+            message: "Password updated successfully",
+            data: {
+                updated: updated
+            }
+        });
+
+    }
+    catch (error) {
+        console.error("Error updating password:", error.message);
+        res.status(500).json({ status: false, message: "Server Error" });
+    }
+}
