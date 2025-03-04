@@ -13,8 +13,8 @@ router.post('/signup', upload.single("userphoto"), signUp)
 router.post('/login', login)
 router.get('/getuser', security, getusers)
 router.patch('/updateprofile', security, upload.single("userphoto"), updateProfile)
-router.post('/forget-password', security, forgotPassword);
-router.post('/verify-reset-otp', security, verifyResetOtp);
+router.post('/forget-password', forgotPassword);
+router.post('/verify-reset-otp', verifyResetOtp);
 router.patch('/change-password', security, changePassword);
 
 

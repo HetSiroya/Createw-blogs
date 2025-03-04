@@ -137,7 +137,7 @@ exports.updateProfile = async (req, res) => {
         // Create response with full image path
         const userResponse = {
             ...updatedUser.toObject(),
-            userphoto: updatedUser.userphoto
+            userImagePath: updatedUser.userphoto
                 ? `${req.protocol}://${req.get('host')}/${updatedUser.userphoto}`
                 : null
         }
