@@ -16,6 +16,10 @@ router.patch('/updateprofile', security, upload.single("userphoto"), updateProfi
 router.post('/forget-password', forgotPassword);
 router.post('/verify-reset-otp', verifyResetOtp);
 router.patch('/change-password', security, changePassword);
+router.post("/logout", (req, res) => {
+    res.clearCookie("bearer");
+    res.status(200).json({ success: true, message: "Logged out successfully" });
+});
 
 
 module.exports = router;
