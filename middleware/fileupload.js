@@ -2,11 +2,13 @@ const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuid } = require('uuid');
+const { log } = require('console');
 
 const uploadDir = 'public/uploads/';
 
 // Ensure the directory exists
 if (!fs.existsSync(uploadDir)) {
+    // log('Upload directory does not exist. Creating...');
     fs.mkdirSync(uploadDir, { recursive: true });
 }
 
