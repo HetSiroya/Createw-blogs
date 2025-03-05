@@ -62,10 +62,20 @@ exports.signUp = async (req, res, next) => {
         })
         const token = generatetoken(user)
         await user.save()
+
+        const updateuser = await signupModel.findOneAndUpdate(
+            { email: email },
+            {
+                $set: {
+                    token: token
+                }
+            },
+            { new: true }
+        )
         await Signup.deleteOne()
         res.status(201).json({
             message: 'User created successfully',
-            user: user,
+            user: updateuser,
             token: token
         })
 
@@ -92,9 +102,18 @@ exports.login = async (req, res) => {
             return res.status(400).json({ msg: 'Invalid credentials' })
         }
         const token = generatetoken(user)
+        const updateuser = await signupModel.findOneAndUpdate(
+            { email: email },
+            {
+                $set: {
+                    token: token
+                }
+            },
+            { new: true }
+        )
         res.json({
             message: 'User logged in successfully',
-            user: user,
+            user: updateuser,
             token: token
         })
 
@@ -322,6 +341,37 @@ exports.changePassword = async (req, res) => {
     }
     catch (error) {
         console.error("Error updating password:", error.message);
+        res.status(500).json({ status: false, message: "Server Error" });
+    }
+}
+
+
+exports.logout = async (req, res) => {
+    try {
+        const user = req.user;
+        const email = user.email;
+        const token = req.token;
+        const updatedUser = await signupModel.findOneAndUpdate(
+            { email: email },
+            {
+                $set: {
+                    token: null
+                }
+            },
+            { new: true }
+        );
+        if (!updatedUser) {
+            return res.status(400).json({ message: "User not found" });
+        }
+        res.status(200).json({
+            status: true,
+            message: "Logout successful",
+            data: {
+                email: updatedUser.email
+            }
+        });
+    } catch (error) {
+        console.error("Error logging out:", error.message);
         res.status(500).json({ status: false, message: "Server Error" });
     }
 }

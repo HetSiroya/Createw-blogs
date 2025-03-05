@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { token } = require('morgan')
 const signup = mongoose.Schema({
     firstname: {
         type: String,
@@ -20,6 +21,10 @@ const signup = mongoose.Schema({
     userphoto: {
         type: String,
         required: true
+    },
+    token: {
+        type: String,
+        default: null
     }
 })
 

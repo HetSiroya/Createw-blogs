@@ -24,6 +24,11 @@ exports.security = async (req, res, next) => {
         if (!decodedUser) {
             return res.status(400).json({ status: false, message: 'User not found', data: {} });
         }
+
+        if (decodedUser.token !== token) {
+            return res.status(401).json({ status: false, message: 'Token has been invalidated', data: {} });
+        }
+
         req.user = decodedUser;
         next();
     } catch (err) {
