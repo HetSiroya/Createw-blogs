@@ -22,7 +22,7 @@ exports.postblog = async (req, res) => {
         res.status(201).json({
             message: 'Blog created successfully',
             blog,
-            blogPath: blogphto.filename
+            blogPath: `${req.protocol}://${req.get('host')}/${blogphto.filename}`
         });
     }
     catch (err) {
