@@ -160,10 +160,25 @@ exports.updateProfile = async (req, res) => {
                 ? `${req.protocol}://${req.get('host')}/${updatedUser.userphoto}`
                 : null
         }
+        console.log(userResponse);
+
+
+        const token = generatetoken(userResponse)
+        const updateuser = await signupModel.findOneAndUpdate(
+            { email: user.email },
+            {
+                $set: {
+                    token: token
+                }
+            },
+            { new: true }
+        )
+        console.log("updateuser", updateuser);
 
         res.status(200).json({
             message: 'User profile updated successfully',
-            user: userResponse
+            user: updateuser,
+            token: token
         })
     }
     catch (error) {
