@@ -108,3 +108,30 @@ exports.getLikes = async (req, res) => {
         });
     }
 }
+
+exports.getblogdetail = async (req, res) => {
+    try {
+        const userid = req.user.id;
+        const likes = await likeModel.find({
+            userId: userid
+        });
+        const like_id = likes.map(like => like.blogId);
+                const blog = await blogModel.find({
+                    _id: { $in: like_id }
+                });
+        
+        if (!blog) {
+            return res.status(404).json({ message: 'Blog not found' });
+        }
+        res.status(200).json({
+            message: 'Blog detail fetched successfully',
+            blog: blog
+        });
+    }
+    catch (err) {
+        res.status(500).json({
+            message: 'Error retrieving blog',
+            error: err.message
+        });
+    }
+}
