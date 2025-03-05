@@ -1,5 +1,6 @@
 const express = require('express');
 const likeModel = require('../Models/likeModel');
+const blogModel = require('../Models/blogModel');
 
 
 exports.likeBlog = async (req, res) => {
@@ -17,9 +18,16 @@ exports.likeBlog = async (req, res) => {
                 message: 'Blog already liked'
             });
         }
+        const blog = await blogModel.findById(blogId);
+        if (!blog) {
+            return res.status(404).json({
+                message: 'Blog not found'
+            });
+        }
         const like = new likeModel({
-            blogId,
-            userId
+            blogId: blogId,
+            userId: userId,
+            blog_post_by: blog.userId
         });
         await like.save();
 
@@ -42,6 +50,7 @@ exports.likeBlog = async (req, res) => {
         });
     }
 }
+
 
 exports.dislike = async (req, res) => {
     try {
@@ -67,6 +76,28 @@ exports.dislike = async (req, res) => {
         });
         res.status(200).json({
             message: 'Blog disliked successfully'
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: 'Server Error',
+            error: error.message
+        });
+    }
+}
+
+exports.getLikes = async (req, res) => {
+    try {
+        const userid = req.user._id;
+        const likes = await likeModel.find({
+            userId: userid
+        });
+        const like_id = likes.map(like => like.blogId);
+
+        res.status(200).json({
+            message: 'Likes fetched successfully',
+            likes: like_id
         });
     }
     catch (error) {

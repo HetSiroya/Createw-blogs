@@ -10,6 +10,11 @@ const Likeschema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'signupModel',
         required: true
+    },
+    blog_post_by: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'signupModel',
+        required: true
     }
 }, {
     timestamps: true
